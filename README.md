@@ -8,11 +8,17 @@ ZALORA Ice Cream API
 - Database: Postgres
 - RESTful API
 
-### Prepare
+### Production API
+[ZALORA ICECREAM API](https://zalora.lyquocnam.com/api/v1/products)
+
+### Setup
 - Install [docker](https://www.docker.com/).
 - Install Postgres database or with docker
 ```
-docker run --name postgres -e POSTGRES_PASSWORD=postgres -d postgres
+docker run --name postgres \
+-p 5432:5432 \
+-e POSTGRES_PASSWORD=postgres \
+-d postgres
 ```
 - Create new postgres database with name: `icecream`.
 ```
