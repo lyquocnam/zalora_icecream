@@ -11,18 +11,8 @@ type User struct {
 	HashedPassword string `gorm:"not null" json:"-"`
 }
 
-func (u *User) HashPassword(password string) error {
-	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
-	if err != nil {
-		return err
-	}
-
-	u.HashedPassword = string(hashed)
-	return nil
-}
-
-func (u *User) ComparePassword(hashedPassword string, plainPassword string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword))
+func (u *User) ComparePassword(plainPassword string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(u.HashedPassword), []byte(plainPassword))
 	if err != nil {
 		return false
 	}

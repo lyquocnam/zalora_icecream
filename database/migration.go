@@ -15,6 +15,7 @@ func Migrate() {
 		models.SourcingValue{},
 		models.Product{},
 		models.Ingredient{},
+		models.User{},
 	}
 
 	isSeed := lib.Config.Seed
@@ -129,7 +130,22 @@ func seed() {
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
+	seedUser()
+
+}
+
+func seedUser() {
+	username := "zalora"
+	password := "zalor@19"
+
+	if err := lib.DB.Create(&models.User{
+		Username:       username,
+		DisplayName:    "Zalora",
+		HashedPassword: lib.HashPassword(password),
+	}).Error; err != nil {
+		log.Fatal(err)
+	}
 }
