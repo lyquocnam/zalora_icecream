@@ -4,8 +4,8 @@ ZALORA Ice Cream API
 [![Build Status](https://travis-ci.com/lyquocnam/zalora_icecream.svg?branch=master)](https://travis-ci.com/lyquocnam/zalora_icecream)
 
 ### App architecture:
-- language: Go
-- database: Postgres
+- Language: Go
+- Database: Postgres
 - RESTful API
 
 ### Prepare
@@ -17,7 +17,7 @@ docker run --name postgres -e POSTGRES_PASSWORD=postgres -d postgres
 - Create new postgres database with name: `icecream`.
 ```
 docker exec -it postgres psql -U postgres
-CREATE DATABASE testdb;
+CREATE DATABASE icecream;
 ```
 
 ### Run with docker
@@ -49,7 +49,7 @@ docker run --rm --name zalora \
 -it lynam/zalora:1.0
 ```
 
-### Build source with docker
+### Build from sourcecode with docker
 - Clone sourcecode
 ```
 git clone https://github.com/lyquocnam/zalora_icecream
