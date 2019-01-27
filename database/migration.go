@@ -29,9 +29,26 @@ func Migrate() {
 			log.Fatal(err)
 		}
 
+		createRelationship()
 		seed()
 	} else {
 		lib.DB.AutoMigrate(tables...)
+	}
+}
+
+func createRelationship() {
+	var cascade = "CASCADE"
+	if err := lib.DB.Table(models.ProductIngredientTable).AddForeignKey("product_id", models.ProductTable+"(id)", cascade, cascade).Error; err != nil {
+		panic(err)
+	}
+	if err := lib.DB.Table(models.ProductIngredientTable).AddForeignKey("ingredient_id", models.IngredientTable+"(id)", cascade, cascade).Error; err != nil {
+		panic(err)
+	}
+	if err := lib.DB.Table(models.ProductSourcingValueTable).AddForeignKey("product_id", models.ProductTable+"(id)", cascade, cascade).Error; err != nil {
+		panic(err)
+	}
+	if err := lib.DB.Table(models.ProductSourcingValueTable).AddForeignKey("sourcing_value_id", models.SourcingValueTable+"(id)", cascade, cascade).Error; err != nil {
+		panic(err)
 	}
 }
 
@@ -56,7 +73,7 @@ func seed() {
 		//allergyInfo :=  item["allergy_info"].(string)
 
 		product := models.Product{
-			ProductId:             item["productId"].(string),
+			ID:                    item["productId"].(string),
 			Name:                  item["name"].(string),
 			ImageOpen:             item["image_open"].(string),
 			ImageClosed:           item["image_open"].(string),
@@ -75,16 +92,20 @@ func seed() {
 			}
 
 			ingredient := &models.Ingredient{}
-			lib.DB.First(&ingredient, "name = ?", name)
+			tx.First(&ingredient, "name = ?", name)
 			if ingredient.ID == 0 && len(name) > 0 {
 				ingredient.Name = name
 				tx.Create(&ingredient)
 			}
 
-			tx.Create(&models.ProductIngredient{
-				ProductID:    product.ProductId,
-				IngredientID: ingredient.ID,
-			})
+			relateObject := &models.ProductIngredient{}
+			tx.First(&relateObject, "product_id = ? and ingredient_id = ?", product.ID, ingredient.ID)
+
+			if relateObject == nil || len(relateObject.ProductID) == 0 {
+				relateObject.ProductID = product.ID
+				relateObject.IngredientID = ingredient.ID
+				tx.Create(&relateObject)
+			}
 		}
 
 		for _, item := range item["sourcing_values"].([]interface{}) {
@@ -94,14 +115,14 @@ func seed() {
 			}
 
 			sourcingValue := &models.SourcingValue{}
-			lib.DB.First(&sourcingValue, "name = ?", name)
+			tx.First(&sourcingValue, "name = ?", name)
 			if sourcingValue.ID == 0 && len(name) > 0 {
 				sourcingValue.Name = name
 				tx.Create(&sourcingValue)
 			}
 
 			tx.Create(&models.ProductSourcingValue{
-				ProductID:       product.ProductId,
+				ProductID:       product.ID,
 				SourcingValueID: sourcingValue.ID,
 			})
 		}

@@ -10,4 +10,10 @@ func loadRoutes(router *echo.Echo) {
 	v1 := router.Group("/api/v1")
 
 	v1.GET("/products", controllers.ProductGetListHandler)
+	v1.GET("/products/:id", controllers.ProductGetByIDHandler)
+
+	authorized := v1.Group("")
+	authorized.POST("/products", controllers.ProductAddHandler)
+	authorized.PUT("/products/:id", controllers.ProductUpdateHandler)
+	authorized.DELETE("/products/:id", controllers.ProductDeleteHandler)
 }
