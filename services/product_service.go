@@ -4,7 +4,6 @@ import (
 	"github.com/lyquocnam/zalora_icecream/lib"
 	"github.com/lyquocnam/zalora_icecream/models"
 	"github.com/lyquocnam/zalora_icecream/view_models"
-	"strconv"
 )
 
 func FindOneProductById(id string) *models.Product {
@@ -58,51 +57,14 @@ func ProductIngredientExist(productId string, ingredientId int) bool {
 	return count > 0
 }
 
-func ConvertListStringToListInt(values []string) ([]int, error) {
-	result := make([]int, 0)
-
-	if len(values) < 1 {
-		return result, nil
-	}
-
-	for _, value := range values {
-		v, err := strconv.Atoi(value)
-		if err != nil {
-			return result, err
-		}
-		result = append(result, v)
-	}
-
-	return result, nil
-}
-
-func ProductContainSourcingValues(sourcingValueIds []int) bool {
-	count := 0
-	lib.DB.Model(&models.SourcingValue{}).Where("id in (?)", sourcingValueIds).Count(&count)
-	return count > 0
-}
-
-func ProductContainIngredients(ingredientIds []int) bool {
-	count := 0
-	lib.DB.Model(&models.Ingredient{}).Where("id in (?)", ingredientIds).Count(&count)
-	return count > 0
-}
-
-func FindProduct() (result []models.Product) {
-	lib.DB.
-		Preload("Ingredients").
-		Preload("SourcingValues").
-		First(&result)
-
-	return result
-}
-
-func FindProductModel() (result []view_models.ProductModel) {
+func FindProductModel() []view_models.ProductModel {
+	result := make([]view_models.ProductModel, 0)
 	var products []models.Product
+
 	lib.DB.
 		Preload("Ingredients").
 		Preload("SourcingValues").
-		First(&products)
+		Find(&products)
 
 	for _, p := range products {
 		result = append(result, p.ToModel())

@@ -22,7 +22,7 @@ func ProductGetByIDHandler(c echo.Context) error {
 		return cc.BadRequest("Id is required")
 	}
 
-	product := services.FindProductModel()
+	product := services.FindOneProductModelById(id)
 
 	if product == nil {
 		return cc.NotFound("Product not found")
